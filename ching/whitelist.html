@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>HWID-Key Whitelist</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #0f0;
+      font-family: monospace;
+      padding: 20px;
+      text-align: center;
+    }
+    input, button {
+      margin: 5px;
+      padding: 8px;
+      background: #222;
+      border: 1px solid #0f0;
+      color: #0f0;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+    }
+    td {
+      border: 1px solid #0f0;
+      padding: 6px 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Key ↔ HWID Whitelist</h1>
+
+  <input id="keyInput" placeholder="Enter Key">
+  <input id="hwidInput" placeholder="Enter HWID">
+  <button onclick="addPair()">Add Pair</button>
+  <button onclick="download()">Export whitelist.json</button>
+
+  <table id="pairTable"></table>
+
+  <script>
+    let pairs = {};
+
+    function render() {
+      const table = document.getElementById('pairTable');
+      table.innerHTML = '<tr><th>Key</th><th>HWID</th><th>Remove</th></tr>';
+      for (const key in pairs) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${key}</td><td>${pairs[key]}</td><td><button onclick="removePair('${key}')">❌</button></td>`;
+        table.appendChild(row);
+      }
+    }
+
+    function addPair() {
+      const key = document.getElementById('keyInput').value.trim();
+      const hwid = document.getElementById('hwidInput').value.trim();
+      if (key && hwid) {
+        pairs[key] = hwid;
+        render();
+        document.getElementById('keyInput').value = '';
+        document.getElementById('hwidInput').value = '';
+      }
+    }
+
+    function removePair(k) {
+      delete pairs[k];
+      render();
+    }
+
+    function download() {
+      const blob = new Blob([JSON.stringify(pairs, null, 2)], {type: 'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'whitelist.json';
+      a.click();
+    }
+  </script>
+</body>
+</html>
